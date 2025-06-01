@@ -4,7 +4,17 @@ class Load extends Phaser.Scene {
     }
 
     preload(){
+        this.load.setPath("./assets/");
 
+        //load in the tiles
+        this.load.image("tilemap", "roguelikeSheet_transparent.png");
+        this.load.tilemapTiledJSON("homeLevel", "homeLevel.tmj");
+
+        //load the tilemap as a spritesheet
+        this.load.spritesheet("tilemap_sheet", "roguelikeSheet_transparent.png",{
+            frameWidth: 16,
+            frameHeight: 16
+        });
     }
 
     create(){
