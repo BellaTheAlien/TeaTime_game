@@ -15,8 +15,8 @@ let config = {
             }
         }
     },
-    width: 1440,
-    height: 900,
+    width: 1200,
+    height: 640,
     scene: [Load, HomeLevel]
 }
 
