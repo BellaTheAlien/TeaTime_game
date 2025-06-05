@@ -17,7 +17,7 @@ let config = {
     },
     width: 1200,
     height: 640,
-    scene: [Load, HomeLevel]
+    scene: [Load, HomeLevel, CaveLevel]
 }
 
 var cursors;

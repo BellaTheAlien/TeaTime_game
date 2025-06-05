@@ -3,6 +3,11 @@ class HomeLevel extends Phaser.Scene {
         super("homeScene");
     }
 
+    //preload for animated tiles
+    preload() {
+        this.load.scenePlugin('AnimatedTiles', './lib/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');
+    }
+
     init(){
         this.TILESIZE = 16;
         this.SCALE = 3.0;
@@ -10,11 +15,6 @@ class HomeLevel extends Phaser.Scene {
         this.TILEHEIGHT = 25;
 
         this.SPEED = 3;
-    }
-
-    //preload for animated tiles
-    preload() {
-        this.load.scenePlugin('AnimatedTiles', './lib/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');
     }
 
     create(){
@@ -28,8 +28,10 @@ class HomeLevel extends Phaser.Scene {
         this.grassLayer = this.map.createLayer("Grass", this.tileset, 0, 0);
         this.pathLayer = this.map.createLayer("Path-n-Stuff", this.tileset, 0, 0);
         this.wallLayer = this.map.createLayer("Walls", this.tileset, 0, 0);
+        this.switcherLayer = this.map.createLayer("switcher", this.tileset, 0, 0);
         this.openDoor = this.map.createLayer("Open-door", this.tileset, 0, 0);
         this.roof_doorsLayers = this.map.createLayer("Roof-n-Doors", this.tileset, 0, 0);
+        
 
 
         //adding the event case logic, when the switch is flipped show the right tiles
@@ -110,7 +112,7 @@ class HomeLevel extends Phaser.Scene {
 
         //adding all the collision walls for each layer
         this.pathLayer.setCollisionByProperty({
-            wall: true
+            wall: true,
         });
         this.wallLayer.setCollisionByProperty({
             wall: true
@@ -122,18 +124,20 @@ class HomeLevel extends Phaser.Scene {
         this.openDoor.setCollisionByProperty({
             switch: true
         });
+        this.physics.add.overlap(my.sprite.rogueChar, this.switcherLayer, collisionProces);
 
 
         this.physics.add.collider(my.sprite.rogueChar, this.pathLayer, collisionProces);
         this.physics.add.collider(my.sprite.rogueChar, this.wallLayer, collisionProces);
         this.physics.add.collider(my.sprite.rogueChar, this.roof_doorsLayers, collisionProces);
         this.physics.add.collider(my.sprite.rogueChar, this.openDoor, collisionProces);
-
+        this.physics.add.collider(my.sprite.rogueChar, this.switcherLayer, collisionProces);
 
 
         //Phasher key inputs
         //the cursor keys
         cursors = this.input.keyboard.createCursorKeys();
+
 
         //camera logic
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
@@ -142,74 +146,6 @@ class HomeLevel extends Phaser.Scene {
         this.cameras.main.setDeadzone(50, 50);
         this.cameras.main.setZoom(this.SCALE);
 
-        //adding the event case logic, when the switch is flipped show the right tiles
-
-        //closed door case
-        /*
-        this.closedSwitchable = this.roof_doorsLayers.filterTiles((tile) => {
-            if (tile.properties.switchable == "closed"){
-                return true;
-            }
-            else{
-                return false;
-            }
-        });
-
-        for( let tile of this.closedSwitchable){
-            tile.visible = true;
-        }
-
-        this.openSwitchable = this.openDoor.filterTiles((tile) => {
-             if (tile.properties.switchable == "open"){
-                return true;
-            }
-            else{
-                return false;
-            }
-        });
-
-        for( let tile of this.openSwitchable){
-            tile.visible = false;
-        }
-        
-        this.switchCollisionOngoing = false;
-
-        let collisionProces = (obj1, obj2) => {
-            //one way collisions
-            if (obj2.properties.oneway){
-                return false;
-            }
-
-            if(!obj2.visible){
-                return false;
-            }
-
-            // the switch handler - for left to right
-            if (obj2.properties.switch && my.sprite.rogueChar.body.velocity.x > 0){
-                obj2.index = 954;
-                for(let tile of this.closedSwitchable){
-                    tile.visible = true;
-                }
-                for(let tile of this.openSwitchable){
-                    tile.visible = false;
-                }
-                return false;
-            }
-
-            //swirch from right to left
-            if (obj2.properties.switch && my.sprite.rogueChar.body.velocity.x < 0){
-                obj2.index = 955;
-                for(let tile of this.closedSwitchable){
-                    tile.visible = false;
-                }
-                for(let tile of this.openSwitchable){
-                    tile.visible = true;
-                }
-                return false;
-            }
-            return true;
-        }
-            */
 
         //logic for animated tiles
         this.animatedTiles.init(this.map);
@@ -217,6 +153,9 @@ class HomeLevel extends Phaser.Scene {
     }
 
     update(){
+
+        this.checkPlayerAtDoor();
+
         //the movment of the charater with cursor keys
 
         if(cursors.left.isDown){
@@ -252,5 +191,27 @@ class HomeLevel extends Phaser.Scene {
 
     tileYtoWorld(tileY) {
         return tileY * this.TILESIZE;
+    }
+
+    checkPlayerAtDoor() {
+        if(!this.openSwitchable) return;
+
+        for(let tile of this.openSwitchable){
+            if (tile.visible){
+
+                let tileWorldX = tile.pixelX;
+                let tileWoeldY = tile.pixelY;
+                let tileWidth = this.map.tileWidth;
+                let tileHight = this.map.tileHeight;
+
+                let playerBounds = my.sprite.rogueChar.getBounds();
+
+                let tileBounds = new Phaser.Geom.Rectangle(tileWorldX, tileWoeldY, tileWidth, tileHight);
+
+                if(Phaser.Geom.Intersects.RectangleToRectangle(playerBounds, tileBounds)) {
+                   this.scene.start('caveScene');
+                }
+            }
+        }
     }
 }

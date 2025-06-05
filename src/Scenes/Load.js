@@ -12,6 +12,7 @@ class Load extends Phaser.Scene {
         //load in the tiles
         this.load.image("tilemap", "roguelikeSheet_transparent.png");
         this.load.tilemapTiledJSON("homeLevel", "homeLevel.tmj");
+        this.load.tilemapTiledJSON("caveLevel", "caveLevel.tmj");
 
         //load the tilemap as a spritesheet
         this.load.spritesheet("tilemap_sheet", "roguelikeSheet_transparent.png",{
@@ -21,6 +22,6 @@ class Load extends Phaser.Scene {
     }
 
     create(){
-        this.scene.start('homeScene');
+        this.scene.start('caveScene');
     }
 }
