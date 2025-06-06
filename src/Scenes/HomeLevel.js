@@ -8,13 +8,19 @@ class HomeLevel extends Phaser.Scene {
         this.load.scenePlugin('AnimatedTiles', './lib/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');
     }
 
-    init(){
+    init(data){
         this.TILESIZE = 16;
         this.SCALE = 3.0;
         this.TILEWIDTH = 48;
         this.TILEHEIGHT = 25;
 
         this.SPEED = 3;
+
+        //the default spawn if there is not data, 
+        // in cave scene the player spawns back infront of the cave door
+        // default the player spawns infront of the house
+        this.spawnX = data.spawnX ?? this.tileXtoWorld(3);
+        this.spawnY = data.spawnY ?? this.tileYtoWorld(8);
     }
 
     create(){
@@ -103,7 +109,7 @@ class HomeLevel extends Phaser.Scene {
        
 
         //making the charater sprite
-        my.sprite.rogueChar = this.physics.add.sprite(this.tileXtoWorld(3), this.tileYtoWorld(8), "rogue_char").setOrigin(0,0);
+        my.sprite.rogueChar = this.physics.add.sprite(this.spawnX, this.spawnY, "rogue_char").setOrigin(0,0);
 
         //this.physics.world.setBounds(this.TILESIZE*this.SCALE, this.TILESIZE*this.SCALE, this.map.widthInPixels - this.SCALE, this.map.heightInPixels - this.SCALE);
         this.physics.world.setBounds(this.TILESIZE, this.TILESIZE, this.map.widthInPixels, this.map.heightInPixels);
@@ -146,6 +152,39 @@ class HomeLevel extends Phaser.Scene {
         this.cameras.main.setDeadzone(50, 50);
         this.cameras.main.setZoom(this.SCALE);
 
+        //the text logic - "lets make tea, I need my kettle and cup from my storage"
+
+        this.openText = this.add.text(
+            my.sprite.rogueChar.x + 30,
+            my.sprite.rogueChar.y,
+            "Let's make tea.\nI need my things from my storage",
+            {
+                font: "Comic Sans MS",
+                fill: "#ffffff",
+                backgroundColor: "#000000",
+                padding: {x: 4, y: 2}
+            }
+        );
+        this.openText.setAlpha(0);
+
+        this.tweens.add({
+            targets: this.openText,
+            alpha: 1,
+            duration: 1000,
+            ease: 'Linear'
+        });
+        this.time.delayedCall(10000, ()=> {
+            this.tweens.add({
+                targets: this.openText,
+                alpha: 0,
+                duration: 1000,
+                ease: 'Linear',
+                onComplete: () => {
+                    this.openText.destroy();
+                }
+            });
+        });
+
 
         //logic for animated tiles
         this.animatedTiles.init(this.map);
@@ -183,6 +222,12 @@ class HomeLevel extends Phaser.Scene {
             my.sprite.rogueChar.setVelocityY(0);
 
         }
+
+        //making the text follow the player
+        this.openText.setPosition(
+            my.sprite.rogueChar.x + 30,
+            my.sprite.rogueChar.y
+        );
     }
 
     tileXtoWorld(tileX) {
@@ -200,13 +245,13 @@ class HomeLevel extends Phaser.Scene {
             if (tile.visible){
 
                 let tileWorldX = tile.pixelX;
-                let tileWoeldY = tile.pixelY;
+                let tileWorldY = tile.pixelY;
                 let tileWidth = this.map.tileWidth;
                 let tileHight = this.map.tileHeight;
 
                 let playerBounds = my.sprite.rogueChar.getBounds();
 
-                let tileBounds = new Phaser.Geom.Rectangle(tileWorldX, tileWoeldY, tileWidth, tileHight);
+                let tileBounds = new Phaser.Geom.Rectangle(tileWorldX, tileWorldY, tileWidth, tileHight);
 
                 if(Phaser.Geom.Intersects.RectangleToRectangle(playerBounds, tileBounds)) {
                    this.scene.start('caveScene');

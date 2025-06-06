@@ -17,11 +17,12 @@ class Load extends Phaser.Scene {
         //load the tilemap as a spritesheet
         this.load.spritesheet("tilemap_sheet", "roguelikeSheet_transparent.png",{
             frameWidth: 16,
-            frameHeight: 16
+            frameHeight: 16,
+            spacing: 1
         });
     }
 
     create(){
-        this.scene.start('caveScene');
+        this.scene.start('homeScene');
     }
 }

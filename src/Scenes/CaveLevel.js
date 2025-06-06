@@ -5,7 +5,7 @@ class CaveLevel extends Phaser.Scene {
 
     //preload for animated tiles
     preload() {
-        //this.load.scenePlugin('AnimatedTiles', './lib/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');
+        this.load.scenePlugin('AnimatedTiles', './lib/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');
     }
 
     init(){
@@ -26,11 +26,22 @@ class CaveLevel extends Phaser.Scene {
 
         //the layeres in the tile map
         this.walls_Ground = this.map.createLayer("Wall-n-Ground", this.tileset, 0, 0);
+        this.doorLayer = this.map.createLayer("Doors", this.tileset, 0, 0);
+        this.othersLayers = this.map.createLayer("Things", this.tileset, 0, 0);
 
-        //this.animatedTiles.init(this.map);
+        this.openDoor = this.doorLayer.filterTiles((tile) => {
+             if (tile.properties.switchable == "open"){
+                return true;
+            }
+            else{
+                return false;
+            }
+        });
+
+        this.animatedTiles.init(this.map);
 
         //making the charater sprite
-        my.sprite.rogueChar = this.physics.add.sprite(this.tileXtoWorld(3), this.tileYtoWorld(8), "rogue_char").setOrigin(0,0);
+        my.sprite.rogueChar = this.physics.add.sprite(this.tileXtoWorld(4), this.tileYtoWorld(3), "rogue_char").setOrigin(0,0);
 
         //this.physics.world.setBounds(this.TILESIZE*this.SCALE, this.TILESIZE*this.SCALE, this.map.widthInPixels - this.SCALE, this.map.heightInPixels - this.SCALE);
         this.physics.world.setBounds(this.TILESIZE, this.TILESIZE, this.map.widthInPixels, this.map.heightInPixels);
@@ -40,6 +51,33 @@ class CaveLevel extends Phaser.Scene {
         this.walls_Ground.setCollisionByProperty({
             wall: true
         });
+
+        //collectables logic for the cup and kettle
+        //because i only have one object for both cup and kettle,
+        // the use of [0] will get the 
+        this.cupPickup = this.map.createFromObjects("Items", {
+            name: "cup",
+            key: "tilemap_sheet",
+            frame: 1023,
+        })[0];
+        this.kettlePickup = this.map.createFromObjects("Items", {
+            name: "kettle",
+            key: "tilemap_sheet",
+            frame: 910
+        })[0];
+
+        this.physics.world.enable(this.cupPickup, Phaser.Physics.Arcade.STATIC_BODY);
+        this.physics.world.enable(this.kettlePickup, Phaser.Physics.Arcade.STATIC_BODY);
+
+        this.physics.add.overlap(my.sprite.rogueChar, this.cupPickup, ()=> {
+            this.cupPickup.destroy();
+            my.inventory.cup = true;
+        });
+        this.physics.add.overlap(my.sprite.rogueChar, this.kettlePickup, ()=> {
+            this.kettlePickup.destroy();
+            my.inventory.kettle = true;
+        });
+
 
         this.physics.add.collider(my.sprite.rogueChar, this.walls_Ground);
 
@@ -56,7 +94,7 @@ class CaveLevel extends Phaser.Scene {
 
     update(){
 
-        //this.checkPlayerAtDoor();
+        this.checkPlayerAtDoor();
 
         //the movment of the charater with cursor keys
 
@@ -93,6 +131,31 @@ class CaveLevel extends Phaser.Scene {
 
     tileYtoWorld(tileY) {
         return tileY * this.TILESIZE;
+    }
+
+    checkPlayerAtDoor() {
+        if(!my.inventory.cup || !my.inventory.kettle) return;
+
+        for(let tile of this.openDoor){
+            if (tile.visible){
+
+                let tileWorldX = tile.pixelX;
+                let tileWorldY = tile.pixelY;
+                let tileWidth = this.map.tileWidth;
+                let tileHight = this.map.tileHeight;
+
+                let playerBounds = my.sprite.rogueChar.getBounds();
+
+                let tileBounds = new Phaser.Geom.Rectangle(tileWorldX, tileWorldY, tileWidth, tileHight);
+
+                if(Phaser.Geom.Intersects.RectangleToRectangle(playerBounds, tileBounds)) {
+                   this.scene.start('homeScene', {
+                    spawnX: this.tileXtoWorld(42),
+                    spawnY: this.tileYtoWorld(20)
+                   });
+                }
+            }
+        }
     }
 
 }
