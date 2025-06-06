@@ -14,6 +14,8 @@ class CaveLevel extends Phaser.Scene {
         this.TILEWIDTH = 48;
         this.TILEHEIGHT = 25;
 
+        this.PARTICLE_VELOCITY = 50;
+
         this.SPEED = 3;
     }
 
@@ -69,11 +71,44 @@ class CaveLevel extends Phaser.Scene {
         this.physics.world.enable(this.cupPickup, Phaser.Physics.Arcade.STATIC_BODY);
         this.physics.world.enable(this.kettlePickup, Phaser.Physics.Arcade.STATIC_BODY);
 
+        //vfx for collection
+        my.vfx.itemCollect = this.add.particles(0, 0, "kenny-particles", {
+            frame: 'star_04.png',
+            scale: {start: 0.03, end: 0.1},
+            lifespan: 350,
+            alpha: {start: 1, end: 0.1}
+        });
+        my.vfx.itemCollect.stop();
+
+        //vfx for walking
+        my.vfx.walking = this.add.particles(0, 0, "kenny-particles", {
+            frame: ['smoke_03.png', 'smoke_06.png'],
+            random: true,
+            scale: {start: 0.03, end: 0.07},
+            maxAliveParticles: 40,
+            gravity: -100,
+            alpha: {start: 1, end: 0.1}
+        });
+        my.vfx.walking.stop();
+
+
         this.physics.add.overlap(my.sprite.rogueChar, this.cupPickup, ()=> {
+            //the vfx for the pick up
+            my.vfx.itemCollect.explode(10, this.cupPickup.x, this.cupPickup.y);
+            //the audio
+            this.sound.play("collected", {
+                volume: 0.5
+            });
             this.cupPickup.destroy();
             my.inventory.cup = true;
         });
         this.physics.add.overlap(my.sprite.rogueChar, this.kettlePickup, ()=> {
+            //vfx pick up logic
+            my.vfx.itemCollect.explode(10, this.kettlePickup.x, this.kettlePickup.y);
+            //the audio
+            this.sound.play("collected", {
+                volume: 0.5
+            });
             this.kettlePickup.destroy();
             my.inventory.kettle = true;
         });
@@ -90,6 +125,14 @@ class CaveLevel extends Phaser.Scene {
         this.cameras.main.setDeadzone(50, 50);
         this.cameras.main.setZoom(this.SCALE);
 
+        //the walking audio
+        this.walkingAudio = this.sound.add("caveWalking", {
+            volume: 0.2,
+            //loop: true,
+            delay: 1,
+            rate: 0.5
+        });
+        this.walkingAudio.stop();
     }
 
     update(){
@@ -101,26 +144,61 @@ class CaveLevel extends Phaser.Scene {
         if(cursors.left.isDown){
             //my.sprite.rogueChar.x -= this.SPEED;
             my.sprite.rogueChar.body.setVelocityX(-this.SPEED * 40);
-           // my.sprite.rogueChar.resetFlip();
+
+            //the walking vfx
+            my.vfx.walking.start();
+            my.vfx.walking.startFollow(my.sprite.rogueChar, my.sprite.rogueChar.displayWidth/2-10, my.sprite.rogueChar.displayHeight/2-5, false);
+            my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
+           //walking audio
+            if(!this.walkingAudio.isPlaying){
+            this.walkingAudio.play();
+           }
         }
 
         else if(cursors.right.isDown) {
             //my.sprite.rogueChar.x += this.SPEED;
             my.sprite.rogueChar.body.setVelocityX(this.SPEED * 40);
-            //my.sprite.rogueChar.serFlip(true, false);
+            //the walking vfx
+            my.vfx.walking.start();
+            my.vfx.walking.startFollow(my.sprite.rogueChar, my.sprite.rogueChar.displayWidth/2-10, my.sprite.rogueChar.displayHeight/2-5, false);
+            my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
+            //walking audio
+            if(!this.walkingAudio.isPlaying){
+            this.walkingAudio.play();
+           }
         }
 
         else if(cursors.up.isDown) {
             //my.sprite.rogueChar.y -= this.SPEED;
             my.sprite.rogueChar.body.setVelocityY(-this.SPEED * 40);
+            //the walking vfx
+            my.vfx.walking.start();
+            my.vfx.walking.startFollow(my.sprite.rogueChar, my.sprite.rogueChar.displayWidth/2-10, my.sprite.rogueChar.displayHeight/2-5, false);
+            my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
+            //walking audio
+            if(!this.walkingAudio.isPlaying){
+            this.walkingAudio.play();
+           }
         }
         else if(cursors.down.isDown) {
            // my.sprite.rogueChar.y += this.SPEED;
            my.sprite.rogueChar.body.setVelocityY(this.SPEED * 40);
+           //the walking vfx
+           my.vfx.walking.start();
+            my.vfx.walking.startFollow(my.sprite.rogueChar, my.sprite.rogueChar.displayWidth/2-10, my.sprite.rogueChar.displayHeight/2-5, false);
+            my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
+           //walking audio
+            if(!this.walkingAudio.isPlaying){
+            this.walkingAudio.play();
+           }
         }
         else{
             my.sprite.rogueChar.setVelocityX(0);
             my.sprite.rogueChar.setVelocityY(0);
+            //stoping the audio
+            this.walkingAudio.stop();
+            //stoping the vfx
+            my.vfx.walking.stop();
 
         }
     }
@@ -149,6 +227,7 @@ class CaveLevel extends Phaser.Scene {
                 let tileBounds = new Phaser.Geom.Rectangle(tileWorldX, tileWorldY, tileWidth, tileHight);
 
                 if(Phaser.Geom.Intersects.RectangleToRectangle(playerBounds, tileBounds)) {
+                    my.fromCave = true;
                    this.scene.start('homeScene', {
                     spawnX: this.tileXtoWorld(42),
                     spawnY: this.tileYtoWorld(20)

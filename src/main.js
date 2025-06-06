@@ -22,6 +22,6 @@ let config = {
 
 var cursors;
 const SCALE = 2.0;
-var my = {sprite: {}, text: {}, vfx: {}, inventory: {cup: false, kettle: false}};
+var my = {sprite: {}, text: {}, vfx: {}, inventory: {cup: false, kettle: false}, fromCave: false};
 
 const game = new Phaser.Game(config);

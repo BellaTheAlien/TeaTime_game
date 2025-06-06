@@ -20,6 +20,13 @@ class Load extends Phaser.Scene {
             frameHeight: 16,
             spacing: 1
         });
+
+        //vfx particals
+        this.load.multiatlas("kenny-particles", "kenny-particles.json");
+
+        this.load.audio("walking", "footstep_grass_004.ogg");
+        this.load.audio("caveWalking", "footstep_concrete_000.ogg");
+        this.load.audio("collected", "jingles_PIZZI09.ogg");
     }
 
     create(){

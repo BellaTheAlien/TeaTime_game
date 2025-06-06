@@ -21,6 +21,10 @@ class HomeLevel extends Phaser.Scene {
         // default the player spawns infront of the house
         this.spawnX = data.spawnX ?? this.tileXtoWorld(3);
         this.spawnY = data.spawnY ?? this.tileYtoWorld(8);
+
+        if(!my.fromCave){
+            my.fromCave = false;
+        }
     }
 
     create(){
@@ -154,10 +158,20 @@ class HomeLevel extends Phaser.Scene {
 
         //the text logic - "lets make tea, I need my kettle and cup from my storage"
 
+        let message;
+
+        if(my.fromCave){
+            message = "Time to make some tea\nI need my campfire";
+            my.fromCave = false;
+        }
+        else{
+            message = "Let's make tea.\nI need my things from my storage";
+        }
+
         this.openText = this.add.text(
             my.sprite.rogueChar.x + 30,
             my.sprite.rogueChar.y,
-            "Let's make tea.\nI need my things from my storage",
+            message,
             {
                 font: "Comic Sans MS",
                 fill: "#ffffff",
@@ -167,13 +181,15 @@ class HomeLevel extends Phaser.Scene {
         );
         this.openText.setAlpha(0);
 
+        //fade in
         this.tweens.add({
             targets: this.openText,
             alpha: 1,
             duration: 1000,
             ease: 'Linear'
         });
-        this.time.delayedCall(10000, ()=> {
+        //fade out in 5 seconds
+        this.time.delayedCall(5000, ()=> {
             this.tweens.add({
                 targets: this.openText,
                 alpha: 0,
@@ -184,6 +200,15 @@ class HomeLevel extends Phaser.Scene {
                 }
             });
         });
+
+        //the walking audio
+        this.walkingAudio = this.sound.add("walking", {
+            volume: 0.2,
+           // loop: true,
+            //delay: 0.1,
+            //rate: 0.5
+        });
+        this.walkingAudio.stop();
 
 
         //logic for animated tiles
@@ -200,26 +225,41 @@ class HomeLevel extends Phaser.Scene {
         if(cursors.left.isDown){
             //my.sprite.rogueChar.x -= this.SPEED;
             my.sprite.rogueChar.body.setVelocityX(-this.SPEED * 40);
-           // my.sprite.rogueChar.resetFlip();
+           // the walking audio to play
+           if(!this.walkingAudio.isPlaying){
+            this.walkingAudio.play();
+           }
         }
 
         else if(cursors.right.isDown) {
             //my.sprite.rogueChar.x += this.SPEED;
             my.sprite.rogueChar.body.setVelocityX(this.SPEED * 40);
-            //my.sprite.rogueChar.serFlip(true, false);
+            //walking audio
+            if(!this.walkingAudio.isPlaying){
+            this.walkingAudio.play();
+           }
         }
 
         else if(cursors.up.isDown) {
             //my.sprite.rogueChar.y -= this.SPEED;
             my.sprite.rogueChar.body.setVelocityY(-this.SPEED * 40);
+            //walking audio
+            if(!this.walkingAudio.isPlaying){
+            this.walkingAudio.play();
+           }
         }
         else if(cursors.down.isDown) {
            // my.sprite.rogueChar.y += this.SPEED;
            my.sprite.rogueChar.body.setVelocityY(this.SPEED * 40);
+           //walking audio
+           if(!this.walkingAudio.isPlaying){
+            this.walkingAudio.play();
+           }
         }
         else{
             my.sprite.rogueChar.setVelocityX(0);
             my.sprite.rogueChar.setVelocityY(0);
+            this.walkingAudio.stop();
 
         }
 
@@ -255,6 +295,7 @@ class HomeLevel extends Phaser.Scene {
 
                 if(Phaser.Geom.Intersects.RectangleToRectangle(playerBounds, tileBounds)) {
                    this.scene.start('caveScene');
+                   this.walkingAudio.stop();
                 }
             }
         }
