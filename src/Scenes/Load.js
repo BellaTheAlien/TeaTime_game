@@ -24,9 +24,16 @@ class Load extends Phaser.Scene {
         //vfx particals
         this.load.multiatlas("kenny-particles", "kenny-particles.json");
 
+        //vxf audio
         this.load.audio("walking", "footstep_grass_004.ogg");
         this.load.audio("caveWalking", "footstep_concrete_000.ogg");
         this.load.audio("collected", "jingles_PIZZI09.ogg");
+        this.load.audio("switchAudio", "impactMetal_heavy_001.ogg");
+
+        //background audio
+        //downloaded from free audio
+        //https://freesound.org/people/Sonic-ranger/sounds/234350/
+        this.load.audio("backgroundAudio", "234350__sonic-ranger__cuckoo-tophill-low-nature-reserve-6am-easter-sunday-2014.wav");
     }
 
     create(){

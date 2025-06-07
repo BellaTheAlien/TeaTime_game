@@ -421,6 +421,11 @@
                  "id":470,
                  "properties":[
                         {
+                         "name":"endGame",
+                         "type":"string",
+                         "value":"end"
+                        }, 
+                        {
                          "name":"wall",
                          "type":"bool",
                          "value":true

@@ -102,6 +102,7 @@
   </tile>
   <tile id="470">
    <properties>
+    <property name="endGame" value="end"/>
     <property name="wall" type="bool" value="true"/>
    </properties>
    <animation>
