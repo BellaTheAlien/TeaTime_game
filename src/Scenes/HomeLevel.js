@@ -46,9 +46,6 @@ class HomeLevel extends Phaser.Scene {
         //the walking audio
         this.walkingAudio = this.sound.add("walking", {
             volume: 0.2,
-           // loop: true,
-            //delay: 0.1,
-            //rate: 0.5
         });
         this.walkingAudio.stop();
 
@@ -125,11 +122,9 @@ class HomeLevel extends Phaser.Scene {
             if (obj2.properties.switch && my.sprite.rogueChar.body.velocity.x > 0){
                 obj2.index = 954;
                 for(let tile of this.closedSwitchable){
-                    //this.switchAudio.play();
                     tile.visible = true;
                 }
                 for(let tile of this.openSwitchable){
-                    //this.switchAudio.play();
                     tile.visible = false;
                 }
                 this.switchAudio.play();
@@ -140,17 +135,14 @@ class HomeLevel extends Phaser.Scene {
             if (obj2.properties.switch && my.sprite.rogueChar.body.velocity.x < 0){
                 obj2.index = 955;
                 for(let tile of this.closedSwitchable){
-                   // this.switchAudio.play();
                     tile.visible = false;
                 }
                 for(let tile of this.openSwitchable){
-                    //this.switchAudio.play();
                     tile.visible = true;
                 }
                 this.switchAudio.play();
                 return false;
             }
-            //this.switchAudio.stop();
             return true;
         }
        
@@ -257,7 +249,6 @@ class HomeLevel extends Phaser.Scene {
         //the movment of the charater with cursor keys
 
         if(cursors.left.isDown){
-            //my.sprite.rogueChar.x -= this.SPEED;
             my.sprite.rogueChar.body.setVelocityX(-this.SPEED * 40);
            // the walking audio to play
            if(!this.walkingAudio.isPlaying){
@@ -266,7 +257,6 @@ class HomeLevel extends Phaser.Scene {
         }
 
         else if(cursors.right.isDown) {
-            //my.sprite.rogueChar.x += this.SPEED;
             my.sprite.rogueChar.body.setVelocityX(this.SPEED * 40);
             //walking audio
             if(!this.walkingAudio.isPlaying){
@@ -275,7 +265,6 @@ class HomeLevel extends Phaser.Scene {
         }
 
         else if(cursors.up.isDown) {
-            //my.sprite.rogueChar.y -= this.SPEED;
             my.sprite.rogueChar.body.setVelocityY(-this.SPEED * 40);
             //walking audio
             if(!this.walkingAudio.isPlaying){
@@ -283,7 +272,6 @@ class HomeLevel extends Phaser.Scene {
            }
         }
         else if(cursors.down.isDown) {
-           // my.sprite.rogueChar.y += this.SPEED;
            my.sprite.rogueChar.body.setVelocityY(this.SPEED * 40);
            //walking audio
            if(!this.walkingAudio.isPlaying){
@@ -348,9 +336,6 @@ class HomeLevel extends Phaser.Scene {
             let tileBounds = new Phaser.Geom.Rectangle(tileWorldX, tileWorldY, tileWidth, tileHight);
 
             if(Phaser.Geom.Intersects.RectangleToRectangle(playerBounds, tileBounds) && tile && my.inventory.kettle && my.inventory.cup) {
-                   //this.scene.restart();,
-                   //this.walkingAudio.stop();
-                  // this.backgroundMusic.stop();
                    this.game.destroy(true);
                    window.location.reload();
                 }

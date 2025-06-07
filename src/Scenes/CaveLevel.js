@@ -142,7 +142,6 @@ class CaveLevel extends Phaser.Scene {
         //the movment of the charater with cursor keys
 
         if(cursors.left.isDown){
-            //my.sprite.rogueChar.x -= this.SPEED;
             my.sprite.rogueChar.body.setVelocityX(-this.SPEED * 40);
 
             //the walking vfx
@@ -156,7 +155,6 @@ class CaveLevel extends Phaser.Scene {
         }
 
         else if(cursors.right.isDown) {
-            //my.sprite.rogueChar.x += this.SPEED;
             my.sprite.rogueChar.body.setVelocityX(this.SPEED * 40);
             //the walking vfx
             my.vfx.walking.start();
@@ -169,7 +167,6 @@ class CaveLevel extends Phaser.Scene {
         }
 
         else if(cursors.up.isDown) {
-            //my.sprite.rogueChar.y -= this.SPEED;
             my.sprite.rogueChar.body.setVelocityY(-this.SPEED * 40);
             //the walking vfx
             my.vfx.walking.start();
@@ -181,7 +178,6 @@ class CaveLevel extends Phaser.Scene {
            }
         }
         else if(cursors.down.isDown) {
-           // my.sprite.rogueChar.y += this.SPEED;
            my.sprite.rogueChar.body.setVelocityY(this.SPEED * 40);
            //the walking vfx
            my.vfx.walking.start();
